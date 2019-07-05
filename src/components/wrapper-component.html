@@ -28,8 +28,8 @@
     </style>
     <div class="container">
       <header-component></header-component>
-      <chat-component id="body"></chat-component>
-      <footer-component id="sendMessage"></footer-component>
+      <chat-component id="chatComponent"></chat-component>
+      <footer-component id="footerComponent"></footer-component>
     </div>
   </template>
   <script>
@@ -48,6 +48,14 @@
             value: []
           }
         };
+      }
+      connectedCallback(){
+        super.connectedCallback();
+        this.chatComponent = this.$.chatComponent;
+        this.addEventListener('new-message', (event)=> {
+          event.stopPropagation();
+          this.chatComponent._createMessage(event.detail.message, false);
+        });
       }
     }
     window.customElements.define(WrapperComponent.is, WrapperComponent);
