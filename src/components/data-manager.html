@@ -1,145 +1,182 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="config-firebase.html">
+
 <dom-module id="data-manager">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
-    <!-- <h2>Hello [[prop1]]!</h2> -->
-  </template>
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+		</style>
+		<!-- <h2>Hello [[prop1]]!</h2> -->
+		<iron-ajax id="ajax"	
+			url="https://api.chucknorris.io/jokes/random"
+			params='{}'
+			handle-as="json"
+			on-response="generateResponse"
+			on-error="generateResponse"
+			>
+		</iron-ajax>
+	</template>
 
-  <script>
-    /**
-     * `data-manager`
-     * Data Manager
-     *
-     * @customElement
-     * @polymer
-     * @demo demo/index.html
-     */
-    class DataManager extends Polymer.Element {
-      static get is() {
-        return "data-manager";
-      }
-      static get properties() {
-        return {
-          prop1: {
-            type: String,
-            value: "data-manager"
-          },
-          users: {
-            type: Array,
-            value: [
-              {
-                email: "user@user.com",
-                password: "user"
-              }
-            ]
-          }
-        };
-      }
-      connectedCallback() {
-        super.connectedCallback();
-      }
-      /**
-       * Método de registro
-       * @param user String usuario
-       * @param pw String password
-       * Añade un Objecto con un usuario y contraseña a la propiedad users
-       * Dispara un evento dm-register-event => detail: 'Successful-registration'
-       * @return true
-       */
-      _registerUser(user, pw) {
-        this.users.push({
-          email: user,
-          password: pw
-        });
+	<script>
+		/**
+		 * `data-manager`
+		 * Data Manager
+		 *
+		 * @customElement
+		 * @polymer
+		 * @demo demo/index.html
+		 */
+		class DataManager extends Polymer.Element {
+			static get is() { return 'data-manager'; }
+			static get properties() {
+				return {
+					prop1: {
+						type: String,
+						value: 'data-manager'
+					},
+					users: {
+						type: Array,
+						value: [
+							{
+								email: "user@user.com",
+								password: "user"
+							}
+						]
+					}
+				};
+			}
 
-        this.dispatchEvent(
-          new CustomEvent("dm-register-event", {
-            detail: {
-              status: 200,
-              message: "Successful-registration"
-            },
-            bubbles: true,
-            composed: true
-          })
-        );
-        return true;
-      }
-      /**
-       * Método de validación de usuario
-       * @param user String usuario
-       * @param pw String password
-       * Verifica en la propiedad users si existe un elemento que coincida con los valores enviados
-       * Dispara un dm-validate-event =>
-       * detail: 'successful-validation' || 'error validation'
-       * @return true || false
-       */
-      _validateUser(user, pw) {
-        console.log(user);
-        console.log(pw);
-        const allUsers = this.users; // Array [{email, password}, {email, password}]
-        let loginSuccess = false;
-        console.log(allUsers);
+			connectedCallback(){
+				super.connectedCallback();
+			}
 
-        allUsers.forEach(listUser => {
-          if (listUser.email === user) {
-            if (listUser.password === pw) {
-              console.log("Autentificado");
-              loginSuccess = true;
-              this.dispatchEvent(
-                new CustomEvent("dm-validate-event", {
-                  detail: {
-                    status: 200,
-                    message: "successful-validation"
-                  },
-                  bubbles: true,
-                  composed: true
-                })
-              );
-              return true;
-            }
-          }
-        });
-        if (!loginSuccess) {
-          console.log("Usuario o Password incorrectos");
-          this.dispatchEvent(
-            new CustomEvent("dm-validate-event", {
-              detail: {
-                status: 400,
-                message: "error validation"
-              },
-              bubbles: true,
-              composed: true
-            })
-          );
-          return false;
-        }
-      }
-      /**
-       * Método para responder el chat
-       * @param message String mensaje
-       * Recibe un mensaje y retorna uno nuevo
-       * Dispara un dm-response-event que contiene un String como detail
-       * @return true
-       */
-      _responseChat(message) {
-        this.dispatchEvent(
-          new CustomEvent("dm-response-event", {
-            detail: {
-              status: 400,
-              message:
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin porta vulputate imperdiet. Vestibulum porta sit amet mauris nec ullamcorper. Proin in eros nibh. Etiam metus odio, bibendum sed augue id, lobortis tristique erat. Pellentesque placerat sapien orci, ac facilisis erat maximus eget. "
-            },
-            bubbles: true,
-            composed: true
-          })
-        );
-        return true;
-      }
-    }
+			/**
+			 * Método de registro
+			 * @param email String usuario
+			 * @param password String password
+			 * Añade a una BD en firebase el usuario
+			 * @event dm-register-event
+			 * detail: 200, 'Successful-registration' || 400, error.message
+			 * @return true
+			 */
+			_registerUser(email, password) {
+				let that = this;
 
-    window.customElements.define(DataManager.is, DataManager);
-  </script>
+				firebase.auth().createUserWithEmailAndPassword(email, password)
+				.then(function(user){
+					console.log('Registro ok');
+					that.dispatchEvent(new CustomEvent('dm-register-event', {
+						detail: {
+							status: 200,
+							message: 'Successful-registration'
+						},
+						bubbles: true,
+						composed: true
+					}));
+				})
+				.catch(function(error) {
+					console.log('Error al registro');
+					that.dispatchEvent(new CustomEvent('dm-register-event', {
+						detail: {
+							status: 400,
+							message: error.message
+						},
+						bubbles: true,
+						composed: true
+					}));
+				});
+				return true;
+			}
+
+			/**
+			 * Método de validación de usuario
+			 * @param email String usuario
+			 * @param password String password
+			 * Verifica en la BD de firebase si existe el usuario
+			 * @event 'dm-validate-event'
+			 * detail: 200, 'successful-validation' || 400, error.message
+			 * @return true
+			 */
+			_validateUser(email, password) {
+				let that = this;
+		
+				firebase.auth().signInWithEmailAndPassword(email, password)
+					.then(function(user){
+						console.log('Login ok');
+						that.dispatchEvent(new CustomEvent('dm-validate-event', {
+							detail: {
+								status: 200,
+								message: 'successful-validation'
+							},
+							bubbles: true,
+							composed: true
+						}));
+					})
+					.catch(function(error) {
+						console.log('Login fallido');
+						that.dispatchEvent(new CustomEvent('dm-validate-event', {
+							detail: {
+								status: 400,
+								message: error.message
+							},
+							bubbles: true,
+							composed: true
+						}));
+					});
+				return true;	
+			}
+
+			/**
+			 * Método para responder el chat
+			 * Invoca a iron-ajax
+			 * Como callback del Iron-ajax ejecta al generateResponse
+			 * @return true
+			 */
+			_responseChat() {
+				this.$.ajax.generateRequest();
+				return true;
+			}
+
+			/**
+			 * Método para enviar la respuesta del iron-ajax mediante un método
+			 * Es invocado por iron-ajax una vez que se se ha completado la promesa
+			 * @event 'dm-response-event'
+			 * detail: 200, message.value || 400, Chuck Norris está durmiendo, no moleste.
+			 * @return true
+			 */
+			generateResponse(event){
+				console.log("ccb");
+				const message = event.detail.response;
+				const errorMessage = 'Chuck Norris está durmiendo, no moleste.';
+				
+				if (event.type === 'response'){
+					console.log(message.value);
+					this.dispatchEvent(new CustomEvent('dm-response-event', {
+						detail: {
+								status: 200,
+								message: message.value
+							},
+						bubbles: true,
+						composed: true
+					}));
+				} else {
+					console.log(errorMessage);
+					this.dispatchEvent(new CustomEvent('dm-response-event', {
+						detail: {
+								status: 400,
+								message: errorMessage
+							},
+						bubbles: true,
+						composed: true
+					}));
+				}
+				return true;
+			}
+		}
+
+		window.customElements.define(DataManager.is, DataManager);
+	</script>
 </dom-module>
