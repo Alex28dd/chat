@@ -23,7 +23,7 @@
         background: transparent;
         outline: none;
         height: 30px;
-        color: #fff;
+        color: #4F5768;
         font-size: 16px;
       }
       .button button {
@@ -58,7 +58,7 @@
           <input id="text" type="text" placeholder="Writes" />
         </div>
         <div class="button">
-          <button id="sendMessage" on-click="(_send)">[[title]]</button>
+          <button id="sendMessage" on-click="_send">[[title]]</button>
         </div>
       </div>
       <!-- </template>
@@ -93,9 +93,17 @@
       connectedCallback() {
         super.connectedCallback();
       }
-      _send() {
-        // this.shadowRoot.querySelector('.footer-chat').style.background = '#0840B9';
+      _send(newMessage) {
+        const msj = this.shadowRoot.querySelector('#text').value;
+        if(msj !== ''){
+          this.dispatchEvent(new CustomEvent('new-message', {
+            bubbles: true,
+            composed: true,
+            detail: {message: msj}
+          }))
+        }
       }
+
     }
     window.customElements.define(FooterComponent.is, FooterComponent);
   </script>
