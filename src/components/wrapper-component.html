@@ -65,6 +65,9 @@
           detail: {message}
         }));
       }
+      _responseFromBackend(message) {
+        this.chatComponent._createMessage(message, true);
+      }
     }
     window.customElements.define(WrapperComponent.is, WrapperComponent);
   </script>
