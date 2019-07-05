@@ -11,6 +11,9 @@
 <dom-module id="login-component">
     <template>
       <style>
+        :root {
+          --paper-input-container-shared-input-style_-_color: #fff !important
+        }
         #loginbox{
           width: 320 px;
           height:420 px;
@@ -36,7 +39,8 @@
           color: white;
           border-radius: 15px;
           font-size: 15px;
-          margin: 60px;
+          margin: 40px 60px;
+          display: flex;
           }
         #form p{
             margin: 0;
@@ -87,8 +91,8 @@
           };
         }
       </style>
-  
-  
+
+
     <section id="loginbox">
       <img src = "peopleicon.png" class="avatar">
       <h1>[[title]]</h1>
@@ -135,7 +139,7 @@
           <dom-if if="[[!_validateView(status)]]">
             <template>
                <paper-button on-click="_Register" raised class="_Register">Register</paper-button>
-  
+
             </template>
           </dom-if>
         </section>
