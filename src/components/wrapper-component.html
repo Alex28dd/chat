@@ -13,7 +13,8 @@
       }
       .container {
         width: 800px;
-        height: 650px;
+        min-height: 450px;
+        max-height: 650px;
         background-color: #072146;
         color: #fff;
         top: 50%;
@@ -55,6 +56,13 @@
         this.addEventListener('new-message', (event)=> {
           event.stopPropagation();
           this.chatComponent._createMessage(event.detail.message, false);
+        });
+      }
+      _sendUserMessage(message){
+        this.dispatchEvent(new CustomEvent('new-user-message', {
+          bubbles: true,
+          composed: true,
+          detail: {message}
         });
       }
     }
