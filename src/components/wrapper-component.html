@@ -55,7 +55,9 @@
         this.chatComponent = this.$.chatComponent;
         this.addEventListener('new-message', (event)=> {
           event.stopPropagation();
-          this.chatComponent._createMessage(event.detail.message, false);
+          const msj = event.detail.message;
+          this.chatComponent._createMessage(msj, false);
+          this._sendUserMessage(msj);
         });
         this._ready();
       }

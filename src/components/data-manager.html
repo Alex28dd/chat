@@ -53,6 +53,22 @@
 				super.connectedCallback();
 			}
 
+
+			/**
+			* Fake response function
+			*/
+			_fakeResponseFromBackend(newMessage) {
+				setTimeout(() => {
+					this.dispatchEvent(new CustomEvent('fake-response-from-backend',{
+						bubbles: true,
+						composed: true,
+						detail: {
+							message: 'fake Backend Response',
+						}
+					}))
+				}, 2000);
+			}
+
 			/**
 			 * Método de registro
 			 * @param email String usuario

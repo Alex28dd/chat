@@ -28,7 +28,7 @@
     </dom-if>
     <dom-if if="[[showChat]]">
       <template>
-        <wrapper-component></wrapper-component>
+        <wrapper-component id="wrapperComponent"></wrapper-component>
       </template>
     </dom-if>
   </template>
@@ -45,11 +45,11 @@
         return {
           showLogIn: {
             type: Boolean,
-            value: false
+            value: true
           },
           showChat: {
             type: Boolean,
-            value: true
+            value: false
           },
           registerError: {
             type: Boolean,
@@ -77,12 +77,15 @@
       connectedCallback() {
         super.connectedCallback();
         this._dataManager = this.$.dataManager;
+        this.addEventListener('wrapper-ready', (event) => {
+          this.chatSetUp();
+        });
         this.addEventListener("login-event", loginData => {
           loginData.stopPropagation();
           const loginDetail = loginData.detail;
           this.requestUserLogIn(loginDetail.username, loginDetail.password);
         });
-        this.addEventListener("register-event", registerData => {
+        this.addEventListener("register-event", (registerData) => {
           const registerDetail = registerData.detail;
           registerData.stopPropagation();
           this.requestUserRegister(
@@ -90,7 +93,7 @@
             registerDetail.password
           );
         });
-        this.addEventListener("dm-register-event", dmEvent => {
+        this.addEventListener("dm-register-event", (dmEvent) => {
           const dmDetail = dmEvent.detail;
           dmEvent.stopPropagation();
           if (dmDetail.status === 200) {
@@ -99,7 +102,7 @@
             this.registerError = true;
           }
         });
-        this.addEventListener("dm-validate-event", dmEvent => {
+        this.addEventListener("dm-validate-event", (dmEvent) => {
           const dmDetail = dmEvent.detail;
           if (dmDetail.status === 200) {
             this.showLogIn = false;
@@ -107,6 +110,18 @@
           } else if (dmDetail.status === 400) {
             this.loginError = true;
           }
+        });
+        this.addEventListener('new-user-message', (newUserMessageEvent) => {
+          const newMessage = newUserMessageEvent.detail.message;
+          newUserMessageEvent.stopPropagation();
+          this._dataManager._fakeResponseFromBackend(newMessage);
+        });
+      }
+      chatSetUp() {
+          this.chatWrapper = this.shadowRoot.getElementById('wrapperComponent');
+          this.addEventListener('fake-response-from-backend', (event) => {
+          const message = event.detail.message;
+          this.chatWrapper._responseFromBackend(message);
         });
       }
 
