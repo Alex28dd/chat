@@ -84,16 +84,16 @@
             font-size: 40px;
             border: none;
             color: white;
-          
           };
         }
       </style>
+  
+  
     <section id="loginbox">
       <img src = "peopleicon.png" class="avatar">
       <h1>[[title]]</h1>
-    <section id="login" role="form">
+      <section id="login" role="form">
         <section class="inputs">
-          <h1>[[subtitle]]</h1>
           <p>Username</p>
           <input id="user" placeholder="user" type="text">
           <p>Password</p>
@@ -123,7 +123,8 @@
         <section id="[[title]]" class$="[[_updateStyles]]">
           <dom-if if="[[_validateView(status)]]">
             <template>
-             <paper-button on-click="_Login" raised class="_Login">LogIn</paper-button>
+               <paper-button on-click="_Login" raised class="_Login">Login</paper-button>
+                <paper-button on-click="_Newaccount" raised class ="_Newaccount">New account</paper-button>
              <dom-if if="[[badlogin]]"><template id="incorrect" >
                <section class = "incorrect">
                       <p>The user or the pasword are incorrect!</p>
@@ -133,7 +134,8 @@
           </dom-if>
           <dom-if if="[[!_validateView(status)]]">
             <template>
-             <paper-button on-click="_Register" raised class="_Register">Register</paper-button>
+               <paper-button on-click="_Register" raised class="_Register">Register</paper-button>
+  
             </template>
           </dom-if>
         </section>
@@ -148,15 +150,11 @@
           return {
             title: {
               type: String,
-              value: 'Register'
-            },
-            subtitle: {
-              type: String,
-              value: ''
+              value: 'Login'
             },
             status: {
               type: Number,
-              value: 1 // 0: register || 1: login
+              value:0 // 0: register || 1: login
             },
             badlogin:{
               type: Boolean,
@@ -169,6 +167,10 @@
         }
         _validateView(status) {
           return status === 0;
+        }
+        _Newaccount(){
+          this.status= 1;
+           this.title = this.status === 1 ? 'Register' : 'Login';
         }
         _Register() {
          const user = this.shadowRoot.querySelector('#user').value;

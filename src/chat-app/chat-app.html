@@ -10,7 +10,6 @@
 />
 
 <link rel="import" href="../components/data-manager.html" />
-<link rel="import" href="../components/chat-header.html" />
 <link rel="import" href="../components/login-component.html" />
 <link rel="import" href="../components/wrapper-component.html" />
 
@@ -24,7 +23,7 @@
     <data-manager id="dataManager"></data-manager>
     <dom-if if="[[showLogIn]]">
       <template id="loginRegister">
-        <login-component></login-component>
+        <login-component loginError="[[loginError]]" registerError="[[registerError]]"></login-component>
       </template>
     </dom-if>
     <dom-if if="[[showChat]]">
@@ -51,6 +50,14 @@
           showChat: {
             type: Boolean,
             value: false
+          },
+          registerError: {
+            type: Boolean,
+            value: false,
+          },
+          loginError: {
+            type: Boolean,
+            value: false,
           }
         };
       }
@@ -88,6 +95,8 @@
           dmEvent.stopPropagation();
           if (dmDetail.status === 200) {
             // Evento de notificación a log-in
+          } else {
+            this.registerError = true;
           }
         });
         this.addEventListener("dm-validate-event", dmEvent => {
@@ -96,6 +105,7 @@
             this.showLogIn = false;
             this.showChat = true;
           } else if (dmDetail.status === 400) {
+            this.loginError = true;
           }
         });
       }
