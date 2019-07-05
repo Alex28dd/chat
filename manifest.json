@@ -1,0 +1,7 @@
+{
+  "name": "chat",
+  "short_name": "chat",
+  "description": "Polymer chat simulator",
+  "start_url": "/",
+  "display": "standalone"
+}

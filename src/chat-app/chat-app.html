@@ -1,0 +1,124 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html" />
+<link
+  rel="import"
+  href="../../bower_components/polymer/lib/elements/dom-if.html"
+/>
+<link rel="import" href="../../bower_components/paper-input/paper-input.html" />
+<link
+  rel="import"
+  href="../../bower_components/paper-button/paper-button.html"
+/>
+
+<link rel="import" href="../components/data-manager.html" />
+<link rel="import" href="../components/chat-header.html" />
+<link rel="import" href="../components/login-component.html" />
+<link rel="import" href="../components/wrapper-component.html" />
+
+<dom-module id="chat-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <data-manager id="dataManager"></data-manager>
+    <dom-if if="[[showLogIn]]">
+      <template id="loginRegister">
+        <login-component></login-component>
+      </template>
+    </dom-if>
+    <dom-if if="[[showChat]]">
+        <wrapper-component></wrapper-component>
+    </dom-if>
+  </template>
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class ChatApp extends Polymer.Element {
+      static get is() {
+        return "chat-app";
+      }
+      static get properties() {
+        return {
+          showLogIn: {
+            type: Boolean,
+            value: true
+          },
+          showChat: {
+            type: Boolean,
+            value: false
+          }
+        };
+      }
+
+      /**
+       * Variable que almacena la referencia al Data Manager
+       */
+      _dataManager;
+
+      constructor() {
+        super();
+      }
+
+      /**
+       * @inheritdoc
+       */
+      connectedCallback() {
+        super.connectedCallback();
+        this._dataManager = this.$.dataManager;
+        this.addEventListener("login-event", loginData => {
+          loginData.stopPropagation();
+          const loginDetail = loginData.detail;
+          this.requestUserLogIn(loginDetail.username, loginDetail.password);
+        });
+        this.addEventListener("register-event", registerData => {
+          const registerDetail = registerData.detail;
+          registerData.stopPropagation();
+          this.requestUserRegister(
+            registerDetail.username,
+            registerDetail.password
+          );
+        });
+        this.addEventListener("dm-register-event", dmEvent => {
+          const dmDetail = dmEvent.detail;
+          dmEvent.stopPropagation();
+          if (dmDetail.status === 200) {
+            // Evento de notificación a log-in
+          }
+        });
+        this.addEventListener("dm-validate-event", dmEvent => {
+          const dmDetail = dmEvent.detail;
+          if (dmDetail.status === 200) {
+            this.showLogIn = false;
+            this.showChat = true;
+          } else if (dmDetail.status === 400) {
+          }
+        });
+      }
+
+      /**
+       * Función que solicita al Data Manager el registro de un nuevo usuario
+       */
+      requestUserRegister(userName, password) {
+        this._dataManager._registerUser(userName, password);
+      }
+
+      /**
+       * Función que solicitará validar los datos de un usuario
+       */
+      requestUserLogIn(userName, password) {
+        this._dataManager._validateUser(userName, password);
+      }
+
+      /**
+       * Función que solicitará el envío de mensaje del chat
+       */
+      sendUserMessage(data) {
+        this._dataManager._responseChat(data.message);
+      }
+    }
+    window.customElements.define(ChatApp.is, ChatApp);
+  </script>
+</dom-module>

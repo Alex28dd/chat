@@ -1,0 +1,55 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html" />
+<link rel="import" href="./header-component.html" />
+<link rel="import" href="./chat-component.html" />
+<link rel="import" href="./footer-component.html" />
+
+<dom-module id="wrapper-component">
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 800px;
+        height: 650px;
+        background-color: #072146;
+        color: #fff;
+        top: 50%;
+        left: 50%;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        box-sizing: border-box;
+        padding: 20px;
+        border-radius: 20px;
+        border-box: 1 solid;
+      }
+    </style>
+    <div class="container">
+      <header-component></header-component>
+      <chat-component id="body"></chat-component>
+      <footer-component id="sendMessage"></footer-component>
+    </div>
+  </template>
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class WrapperComponent extends Polymer.Element {
+      static get is() {
+        return "wrapper-component";
+      }
+      static get properties() {
+        return {
+          users: {
+            type: Array,
+            value: []
+          }
+        };
+      }
+    }
+    window.customElements.define(WrapperComponent.is, WrapperComponent);
+  </script>
+</dom-module>

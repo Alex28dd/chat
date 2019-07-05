@@ -1,0 +1,145 @@
+<dom-module id="data-manager">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <!-- <h2>Hello [[prop1]]!</h2> -->
+  </template>
+
+  <script>
+    /**
+     * `data-manager`
+     * Data Manager
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class DataManager extends Polymer.Element {
+      static get is() {
+        return "data-manager";
+      }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: "data-manager"
+          },
+          users: {
+            type: Array,
+            value: [
+              {
+                email: "user@user.com",
+                password: "user"
+              }
+            ]
+          }
+        };
+      }
+      connectedCallback() {
+        super.connectedCallback();
+      }
+      /**
+       * Método de registro
+       * @param user String usuario
+       * @param pw String password
+       * Añade un Objecto con un usuario y contraseña a la propiedad users
+       * Dispara un evento dm-register-event => detail: 'Successful-registration'
+       * @return true
+       */
+      _registerUser(user, pw) {
+        this.users.push({
+          email: user,
+          password: pw
+        });
+
+        this.dispatchEvent(
+          new CustomEvent("dm-register-event", {
+            detail: {
+              status: 200,
+              message: "Successful-registration"
+            },
+            bubbles: true,
+            composed: true
+          })
+        );
+        return true;
+      }
+      /**
+       * Método de validación de usuario
+       * @param user String usuario
+       * @param pw String password
+       * Verifica en la propiedad users si existe un elemento que coincida con los valores enviados
+       * Dispara un dm-validate-event =>
+       * detail: 'successful-validation' || 'error validation'
+       * @return true || false
+       */
+      _validateUser(user, pw) {
+        console.log(user);
+        console.log(pw);
+        const allUsers = this.users; // Array [{email, password}, {email, password}]
+        let loginSuccess = false;
+        console.log(allUsers);
+
+        allUsers.forEach(listUser => {
+          if (listUser.email === user) {
+            if (listUser.password === pw) {
+              console.log("Autentificado");
+              loginSuccess = true;
+              this.dispatchEvent(
+                new CustomEvent("dm-validate-event", {
+                  detail: {
+                    status: 200,
+                    message: "successful-validation"
+                  },
+                  bubbles: true,
+                  composed: true
+                })
+              );
+              return true;
+            }
+          }
+        });
+        if (!loginSuccess) {
+          console.log("Usuario o Password incorrectos");
+          this.dispatchEvent(
+            new CustomEvent("dm-validate-event", {
+              detail: {
+                status: 400,
+                message: "error validation"
+              },
+              bubbles: true,
+              composed: true
+            })
+          );
+          return false;
+        }
+      }
+      /**
+       * Método para responder el chat
+       * @param message String mensaje
+       * Recibe un mensaje y retorna uno nuevo
+       * Dispara un dm-response-event que contiene un String como detail
+       * @return true
+       */
+      _responseChat(message) {
+        this.dispatchEvent(
+          new CustomEvent("dm-response-event", {
+            detail: {
+              status: 400,
+              message:
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin porta vulputate imperdiet. Vestibulum porta sit amet mauris nec ullamcorper. Proin in eros nibh. Etiam metus odio, bibendum sed augue id, lobortis tristique erat. Pellentesque placerat sapien orci, ac facilisis erat maximus eget. "
+            },
+            bubbles: true,
+            composed: true
+          })
+        );
+        return true;
+      }
+    }
+
+    window.customElements.define(DataManager.is, DataManager);
+  </script>
+</dom-module>
