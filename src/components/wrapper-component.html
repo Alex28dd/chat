@@ -57,6 +57,7 @@
           event.stopPropagation();
           this.chatComponent._createMessage(event.detail.message, false);
         });
+        this._ready();
       }
       _sendUserMessage(message){
         this.dispatchEvent(new CustomEvent('new-user-message', {
@@ -67,6 +68,13 @@
       }
       _responseFromBackend(message) {
         this.chatComponent._createMessage(message, true);
+      }
+      _ready() {
+        this.dispatchEvent(new CustomEvent('wrapper-ready', {
+          bubbles: true,
+          composed: true,
+          detail: {}
+        }));
       }
     }
     window.customElements.define(WrapperComponent.is, WrapperComponent);
