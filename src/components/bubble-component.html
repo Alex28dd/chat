@@ -43,20 +43,20 @@
       }
     </style>
     <dom-if if="[[user]]">
-      <!-- <template> -->
+      <template>
       <div id="template1" class="chat-message user1">
         <div class="user-photo1"></div>
         <p class="message">[[message]]</p>
       </div>
-      <!-- </template> -->
+      </template>
     </dom-if>
     <dom-if if="[[!user]]">
-      <!-- <template> -->
+      <template>
       <div class="chat-message user2">
         <div class="user-photo2"></div>
         <p class="message">[[message]]</p>
       </div>
-      <!-- </template> -->
+      </template>
     </dom-if>
   </template>
 
